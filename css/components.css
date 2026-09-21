@@ -1,0 +1,172 @@
+@layer componentes {
+  /* Cabecera */
+  .cabecera__marca {
+    font-family: var(--fuente-poetica);
+    font-size: 2.25rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--acento);
+  }
+
+  .cabecera__lema,
+  .pie {
+    font-size: 0.875rem;
+    color: var(--texto-suave);
+  }
+
+  /* Botones y ajustes */
+  .ajustes,
+  .pasar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espacio-2);
+  }
+
+  .boton {
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+    padding: var(--espacio-2) var(--espacio-3);
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s;
+
+    &:hover:not(:disabled) {
+      border-color: var(--interaccion);
+      background: var(--interaccion-fondo);
+    }
+
+    &[aria-pressed="true"] {
+      border-color: var(--interaccion);
+      background: var(--interaccion-fondo);
+      color: var(--interaccion);
+    }
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+  }
+
+  /* Índice */
+  .indice__titulo {
+    margin-bottom: var(--espacio-3);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--texto-suave);
+  }
+
+  .indice__lista {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espacio-1);
+  }
+
+  .indice__enlace {
+    display: flex;
+    flex-direction: column;
+    padding: var(--espacio-2) var(--espacio-3);
+    border-left: 3px solid transparent;
+    border-radius: 0 var(--radio) var(--radio) 0;
+    transition: background-color 0.15s, border-color 0.15s;
+
+    &:hover {
+      background: var(--interaccion-fondo);
+    }
+
+    &[aria-current="true"] {
+      border-left-color: var(--interaccion);
+      background: var(--interaccion-fondo);
+    }
+  }
+
+  .indice__nombre {
+    font-family: var(--fuente-poetica);
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+
+  .indice__autor {
+    font-size: 0.8125rem;
+    color: var(--texto-suave);
+  }
+
+  /* Soneto */
+  .soneto {
+    padding: var(--espacio-5) var(--espacio-4);
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    font-family: var(--fuente-poetica);
+  }
+
+  .soneto__cabecera {
+    margin-bottom: var(--espacio-5);
+    text-align: center;
+  }
+
+  .soneto__titulo {
+    font-size: clamp(2rem, 1.2rem + 3vw, 3.375rem);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--acento);
+  }
+
+  .soneto__autor {
+    margin-top: var(--espacio-2);
+    font-size: 1.25rem;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--texto-suave);
+  }
+
+  .soneto__cuerpo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espacio-4);
+    width: fit-content;
+    max-width: 100%;
+    margin-inline: auto;
+  }
+
+  .estrofa {
+    max-width: var(--medida);
+    font-size: var(--tamano-lectura);
+    line-height: 1.55;
+  }
+
+  .verso {
+    position: relative;
+    padding-left: 2ch;
+    text-indent: -2ch;
+  }
+
+  .con-numeracion .verso::before {
+    content: attr(data-numero);
+    position: absolute;
+    right: 100%;
+    margin-right: var(--espacio-2);
+    text-indent: 0;
+    font-family: var(--fuente-interfaz);
+    font-size: 0.65rem;
+    line-height: calc(var(--tamano-lectura) * 1.55);
+    color: var(--texto-suave);
+  }
+
+  /* Navegación entre sonetos */
+  .pasar {
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .pasar__posicion {
+    font-size: 0.875rem;
+    color: var(--texto-suave);
+  }
+}

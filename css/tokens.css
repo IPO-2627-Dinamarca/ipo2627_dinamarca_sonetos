@@ -1,0 +1,56 @@
+@layer tokens, base, layout, componentes;
+
+/*
+  ESTRATEGIA CROMÁTICA · complementaria
+  - Burdeos (h≈25): color de acento cálido, para lo que se lee (títulos, versos numerados).
+  - Verde azulado (h≈195): su complementario, reservado a lo interactivo (foco, elemento activo).
+  - Neutros cálidos (h≈80) tintados de papel: fondo y texto, sin negro ni blanco puros.
+  Modo claro/oscuro con light-dark(); el atributo data-tema lo fuerza vía color-scheme.
+
+  ESTRATEGIA TIPOGRÁFICA · dos fuentes contrastadas
+  - Cormorant Garamond (serif de trazo fino): voz poética (título, autor, versos).
+  - Inter (sans neutra): voz de la interfaz (botones, índice, pie).
+
+  ESTRATEGIA ESPACIAL
+  - Escala modular en rem (razón 1,5) y medida de lectura en ch.
+  - Gestalt: proximidad (estrofas separadas, versos juntos), similitud (mismo
+    estilo para cuartetos y tercetos), cierre (marco del soneto), figura/fondo.
+*/
+@layer tokens {
+  :root {
+    color-scheme: light dark;
+
+    --fondo: light-dark(oklch(96% 0.015 85), oklch(21% 0.015 60));
+    --superficie: light-dark(oklch(99% 0.008 85), oklch(26% 0.018 60));
+    --borde: light-dark(oklch(86% 0.02 80), oklch(35% 0.02 60));
+    --texto: light-dark(oklch(25% 0.02 60), oklch(92% 0.015 85));
+    --texto-suave: light-dark(oklch(48% 0.02 60), oklch(72% 0.02 80));
+
+    --acento: light-dark(oklch(40% 0.13 25), oklch(78% 0.11 25));
+    --interaccion: light-dark(oklch(45% 0.09 195), oklch(78% 0.09 195));
+    --interaccion-fondo: light-dark(oklch(93% 0.03 195), oklch(30% 0.04 195));
+
+    --fuente-poetica: "Cormorant Garamond", "Palatino Linotype", Georgia, serif;
+    --fuente-interfaz: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+    --tamano-lectura: 1.25rem;
+
+    --espacio-1: 0.25rem;
+    --espacio-2: 0.5rem;
+    --espacio-3: 1rem;
+    --espacio-4: 1.5rem;
+    --espacio-5: 2.25rem;
+    --espacio-6: 3.375rem;
+
+    --radio: 0.5rem;
+    --medida: 48ch;
+  }
+
+  :root[data-tema="claro"] {
+    color-scheme: light;
+  }
+
+  :root[data-tema="oscuro"] {
+    color-scheme: dark;
+  }
+}

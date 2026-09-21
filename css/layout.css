@@ -1,0 +1,69 @@
+@layer layout {
+  .app {
+    display: grid;
+    grid-template-columns: minmax(15rem, 20rem) minmax(0, 1fr);
+    grid-template-areas:
+      "cabecera cabecera"
+      "indice   lectura"
+      "pie      pie";
+    gap: var(--espacio-5) var(--espacio-6);
+    max-width: 75rem;
+    margin-inline: auto;
+    padding: var(--espacio-4) var(--espacio-4) var(--espacio-3);
+    min-height: 100vh;
+    grid-template-rows: auto 1fr auto;
+  }
+
+  .cabecera {
+    grid-area: cabecera;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--espacio-2) var(--espacio-4);
+    padding-bottom: var(--espacio-3);
+    border-bottom: 1px solid var(--borde);
+  }
+
+  .cabecera__marca {
+    margin-right: auto;
+  }
+
+  .indice {
+    grid-area: indice;
+    align-self: start;
+    position: sticky;
+    top: var(--espacio-4);
+  }
+
+  .lectura {
+    grid-area: lectura;
+    display: flex;
+    flex-direction: column;
+    gap: var(--espacio-5);
+    min-width: 0;
+  }
+
+  .pie {
+    grid-area: pie;
+    padding-top: var(--espacio-3);
+    border-top: 1px solid var(--borde);
+  }
+
+  @media (max-width: 52rem) {
+    .app {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        "cabecera"
+        "lectura"
+        "indice"
+        "pie";
+      grid-template-rows: none;
+      gap: var(--espacio-5);
+      padding-inline: var(--espacio-3);
+    }
+
+    .indice {
+      position: static;
+    }
+  }
+}
