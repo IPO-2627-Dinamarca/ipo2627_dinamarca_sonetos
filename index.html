@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sonetos · Lector</title>
+  <meta name="description" content="Lector de sonetos del Siglo de Oro español.">
+  <meta name="color-scheme" content="light dark">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600&display=swap">
+
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+  <a class="salto" href="#lectura">Saltar al soneto</a>
+
+  <div class="app">
+    <header class="cabecera">
+      <p class="cabecera__marca">Sonetos</p>
+      <p class="cabecera__lema">Catorce versos, cuatro estrofas</p>
+
+      <div class="ajustes" role="group" aria-label="Ajustes de lectura">
+        <button type="button" class="boton" data-accion="tamano-menos" aria-label="Reducir tamaño del texto">A−</button>
+        <button type="button" class="boton" data-accion="tamano-mas" aria-label="Aumentar tamaño del texto">A+</button>
+        <button type="button" class="boton" data-accion="numeracion" aria-pressed="false">Numerar versos</button>
+        <button type="button" class="boton" data-accion="tema" aria-pressed="false">Modo oscuro</button>
+      </div>
+    </header>
+
+    <nav class="indice" aria-labelledby="indice-titulo">
+      <h2 class="indice__titulo" id="indice-titulo">Antología</h2>
+      <ul class="indice__lista" data-vista="indice"></ul>
+    </nav>
+
+    <main class="lectura" id="lectura">
+      <article class="soneto" data-vista="soneto">
+        <noscript>Esta aplicación necesita JavaScript para mostrar los sonetos.</noscript>
+      </article>
+
+      <nav class="pasar" aria-label="Navegación entre sonetos">
+        <button type="button" class="boton" data-accion="anterior">← Anterior</button>
+        <p class="pasar__posicion" data-vista="posicion"></p>
+        <button type="button" class="boton" data-accion="siguiente">Siguiente →</button>
+      </nav>
+    </main>
+
+    <footer class="pie">
+      <p>Grupo Dinamarca · IPO 2026/27</p>
+    </footer>
+  </div>
+</body>
+</html>
