@@ -1,3 +1,5 @@
+// MODELO: preferencias de lectura (tema, tamaño del texto, numeración de versos).
+// Se guardan en localStorage para que se mantengan al volver a abrir la página.
 const CLAVE = "sonetos:preferencias";
 
 export const TAMANO_MIN = 1;

@@ -1,3 +1,7 @@
+/* COMPONENTES: aspecto de cada pieza, con nombres de clase tipo BEM (bloque__elemento)
+   y anidamiento CSS nativo (&) para los estados (hover, pulsado, desactivado).
+   Los estados se leen de atributos ARIA (aria-pressed, aria-current), así el
+   estilo y la accesibilidad no se pueden desincronizar. */
 @layer componentes {
   /* Cabecera */
   .cabecera__marca {
@@ -5,7 +9,7 @@
     font-size: 2.25rem;
     font-weight: 700;
     line-height: 1;
-    color: var(--acento);
+    color: var(--color-primario);
   }
 
   .cabecera__lema,
@@ -32,17 +36,17 @@
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.15s, border-color 0.15s;
+    transition: background-color var(--duracion), border-color var(--duracion);
 
     &:hover:not(:disabled) {
-      border-color: var(--interaccion);
-      background: var(--interaccion-fondo);
+      border-color: var(--color-complementario);
+      background: var(--color-complementario-fondo);
     }
 
     &[aria-pressed="true"] {
-      border-color: var(--interaccion);
-      background: var(--interaccion-fondo);
-      color: var(--interaccion);
+      border-color: var(--color-complementario);
+      background: var(--color-complementario-fondo);
+      color: var(--color-complementario);
     }
 
     &:disabled {
@@ -54,7 +58,7 @@
   /* Índice */
   .indice__titulo {
     margin-bottom: var(--espacio-3);
-    font-size: 0.75rem;
+    font-size: 0.875rem;
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -73,15 +77,15 @@
     padding: var(--espacio-2) var(--espacio-3);
     border-left: 3px solid transparent;
     border-radius: 0 var(--radio) var(--radio) 0;
-    transition: background-color 0.15s, border-color 0.15s;
+    transition: background-color var(--duracion), border-color var(--duracion);
 
     &:hover {
-      background: var(--interaccion-fondo);
+      background: var(--color-complementario-fondo);
     }
 
     &[aria-current="true"] {
-      border-left-color: var(--interaccion);
-      background: var(--interaccion-fondo);
+      border-left-color: var(--color-complementario);
+      background: var(--color-complementario-fondo);
     }
   }
 
@@ -115,7 +119,7 @@
     font-size: clamp(2rem, 1.2rem + 3vw, 3.375rem);
     font-weight: 700;
     line-height: 1.1;
-    color: var(--acento);
+    color: var(--color-primario);
   }
 
   .soneto__autor {
@@ -154,7 +158,7 @@
     margin-right: var(--espacio-2);
     text-indent: 0;
     font-family: var(--fuente-interfaz);
-    font-size: 0.65rem;
+    font-size: 0.75rem;
     line-height: calc(var(--tamano-lectura) * 1.55);
     color: var(--texto-suave);
   }

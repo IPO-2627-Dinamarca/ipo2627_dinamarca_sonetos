@@ -1,3 +1,6 @@
+/* LAYOUT: reparto de la página con CSS Grid y áreas con nombre.
+   Escritorio: índice a la izquierda y soneto a la derecha.
+   Pantallas estrechas (< 52rem): una sola columna, con el soneto antes que el índice. */
 @layer layout {
   .app {
     display: grid;

@@ -1,3 +1,5 @@
+// MODELO: almacén de sonetos. Guarda la colección y permite buscar por id o por
+// posición (porIndice da la vuelta al llegar al final o al principio).
 import { Soneto } from "./soneto.js";
 
 export class Almacen {

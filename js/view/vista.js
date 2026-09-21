@@ -1,3 +1,8 @@
+// VISTA: única parte que toca el DOM y el CSSOM. Pinta el índice y el soneto,
+// aplica las preferencias (atributo data-tema, clase con-numeracion y la variable
+// CSS --tamano-lectura) y avisa al controlador de lo que hace el usuario.
+// Los elementos se localizan por atributos data-vista / data-accion, no por clases
+// de estilo, para que cambiar el CSS no rompa el JS.
 const raiz = document.documentElement;
 
 const $ = (selector) => document.querySelector(selector);
@@ -18,9 +23,17 @@ export class Vista {
         enlace.className = "indice__enlace";
         enlace.href = `#${id}`;
         enlace.dataset.id = id;
-        enlace.innerHTML = `<span class="indice__nombre"></span><span class="indice__autor"></span>`;
-        enlace.querySelector(".indice__nombre").textContent = titulo;
-        enlace.querySelector(".indice__autor").textContent = autor;
+        enlace.dataset.vista = "enlace-soneto";
+
+        const nombre = document.createElement("span");
+        nombre.className = "indice__nombre";
+        nombre.textContent = titulo;
+
+        const firma = document.createElement("span");
+        firma.className = "indice__autor";
+        firma.textContent = autor;
+
+        enlace.append(nombre, firma);
 
         const item = document.createElement("li");
         item.append(enlace);
@@ -36,6 +49,7 @@ export class Vista {
     const titulo = document.createElement("h1");
     titulo.className = "soneto__titulo";
     titulo.tabIndex = -1;
+    titulo.dataset.vista = "titulo-soneto";
     titulo.textContent = soneto.titulo;
 
     const autor = document.createElement("p");
@@ -55,8 +69,9 @@ export class Vista {
   }
 
   enfocarTitulo() {
-    this.#soneto.querySelector(".soneto__titulo")?.focus({ preventScroll: true });
-    this.#soneto.scrollIntoView({ block: "start", behavior: "smooth" });
+    this.#soneto.querySelector('[data-vista="titulo-soneto"]')?.focus({ preventScroll: true });
+    const sinAnimacion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    this.#soneto.scrollIntoView({ block: "start", behavior: sinAnimacion ? "auto" : "smooth" });
   }
 
   #crearEstrofa({ tipo, inicio, versos }, posicion) {
@@ -78,7 +93,7 @@ export class Vista {
   }
 
   #marcarActivo(id) {
-    this.#indice.querySelectorAll(".indice__enlace").forEach((enlace) => {
+    this.#indice.querySelectorAll('[data-vista="enlace-soneto"]').forEach((enlace) => {
       if (enlace.dataset.id === id) {
         enlace.setAttribute("aria-current", "true");
       } else {
@@ -114,7 +129,7 @@ export class Vista {
 
   alSeleccionar(manejador) {
     this.#indice.addEventListener("click", (evento) => {
-      const enlace = evento.target.closest(".indice__enlace");
+      const enlace = evento.target.closest('[data-vista="enlace-soneto"]');
       if (!enlace) return;
       evento.preventDefault();
       manejador(enlace.dataset.id);

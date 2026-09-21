@@ -1,3 +1,5 @@
+// MODELO: un soneto (título, autor y 14 versos). Comprueba que tiene 14 versos
+// y los agrupa en su estructura fija: dos cuartetos y dos tercetos.
 const ESTRUCTURA = [
   { tipo: "cuarteto", versos: 4 },
   { tipo: "cuarteto", versos: 4 },

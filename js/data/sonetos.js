@@ -1,3 +1,5 @@
+// Datos de los sonetos (copiados de la carpeta sonetos/). Cada uno tiene un id,
+// que se usa en la URL, su título, su autor y sus 14 versos en orden.
 export const SONETOS = [
   {
     id: "a-una-nariz",

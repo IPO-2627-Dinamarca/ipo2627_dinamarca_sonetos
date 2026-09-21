@@ -1,18 +1,25 @@
+/* Orden de las capas: una capa posterior gana a una anterior sea cual sea la
+   especificidad del selector, así no hacen falta !important ni selectores largos. */
 @layer tokens, base, layout, componentes;
 
 /*
-  ESTRATEGIA CROMÁTICA · complementaria
-  - Burdeos (h≈25): color de acento cálido, para lo que se lee (títulos, versos numerados).
-  - Verde azulado (h≈195): su complementario, reservado a lo interactivo (foco, elemento activo).
-  - Neutros cálidos (h≈80) tintados de papel: fondo y texto, sin negro ni blanco puros.
+  ESTRATEGIA CROMÁTICA · complementaria (sistema HSL)
+  - Un único tono base (--matiz-primario, burdeos) y su complementario, calculado con
+    calc(): H + 180. Cambiando el tono base se recalcula toda la paleta.
+  - Primario (burdeos): para lo que se lee (marca y título del soneto).
+  - Complementario (verde azulado): reservado a lo interactivo (foco, elemento activo).
+  - Neutros cálidos (--matiz-neutro) tintados de papel: fondo y texto, sin negro ni blanco puros.
   Modo claro/oscuro con light-dark(); el atributo data-tema lo fuerza vía color-scheme.
+  Todos los pares texto/fondo cumplen contraste WCAG AA (≥ 4,5:1).
 
   ESTRATEGIA TIPOGRÁFICA · dos fuentes contrastadas
-  - Cormorant Garamond (serif de trazo fino): voz poética (título, autor, versos).
-  - Inter (sans neutra): voz de la interfaz (botones, índice, pie).
+  - Serif del sistema (Palatino/Georgia): voz poética (título, autor, versos).
+  - Sans del sistema (system-ui): voz de la interfaz (botones, índice, pie).
+  Solo fuentes locales del sistema, sin recursos externos.
 
   ESTRATEGIA ESPACIAL
-  - Escala modular en rem (razón 1,5) y medida de lectura en ch.
+  - Espaciado en rem: desde 1rem crece con razón 1,5 (1 → 1,5 → 2,25 → 3,375)
+    y hacia abajo se divide entre 2 (0,5 → 0,25). Medida de lectura en ch.
   - Gestalt: proximidad (estrofas separadas, versos juntos), similitud (mismo
     estilo para cuartetos y tercetos), cierre (marco del soneto), figura/fondo.
 */
@@ -20,18 +27,22 @@
   :root {
     color-scheme: light dark;
 
-    --fondo: light-dark(oklch(96% 0.015 85), oklch(21% 0.015 60));
-    --superficie: light-dark(oklch(99% 0.008 85), oklch(26% 0.018 60));
-    --borde: light-dark(oklch(86% 0.02 80), oklch(35% 0.02 60));
-    --texto: light-dark(oklch(25% 0.02 60), oklch(92% 0.015 85));
-    --texto-suave: light-dark(oklch(48% 0.02 60), oklch(72% 0.02 80));
+    --matiz-primario: 350;
+    --matiz-complementario: calc(var(--matiz-primario) + 180);
+    --matiz-neutro: 40;
 
-    --acento: light-dark(oklch(40% 0.13 25), oklch(78% 0.11 25));
-    --interaccion: light-dark(oklch(45% 0.09 195), oklch(78% 0.09 195));
-    --interaccion-fondo: light-dark(oklch(93% 0.03 195), oklch(30% 0.04 195));
+    --fondo: light-dark(hsl(var(--matiz-neutro), 35%, 95%), hsl(var(--matiz-neutro), 10%, 12%));
+    --superficie: light-dark(hsl(var(--matiz-neutro), 40%, 98%), hsl(var(--matiz-neutro), 10%, 16%));
+    --borde: light-dark(hsl(var(--matiz-neutro), 20%, 84%), hsl(var(--matiz-neutro), 8%, 25%));
+    --texto: light-dark(hsl(var(--matiz-neutro), 15%, 14%), hsl(var(--matiz-neutro), 25%, 90%));
+    --texto-suave: light-dark(hsl(var(--matiz-neutro), 10%, 36%), hsl(var(--matiz-neutro), 10%, 68%));
 
-    --fuente-poetica: "Cormorant Garamond", "Palatino Linotype", Georgia, serif;
-    --fuente-interfaz: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --color-primario: light-dark(hsl(var(--matiz-primario), 65%, 30%), hsl(var(--matiz-primario), 60%, 76%));
+    --color-complementario: light-dark(hsl(var(--matiz-complementario), 70%, 22%), hsl(var(--matiz-complementario), 50%, 72%));
+    --color-complementario-fondo: light-dark(hsl(var(--matiz-complementario), 30%, 90%), hsl(var(--matiz-complementario), 30%, 20%));
+
+    --fuente-poetica: "Palatino Linotype", Palatino, Georgia, serif;
+    --fuente-interfaz: system-ui, -apple-system, "Segoe UI", sans-serif;
 
     --tamano-lectura: 1.25rem;
 
@@ -43,7 +54,14 @@
     --espacio-6: 3.375rem;
 
     --radio: 0.5rem;
+    --duracion: 0.15s;
     --medida: 48ch;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --duracion: 0s;
+    }
   }
 
   :root[data-tema="claro"] {

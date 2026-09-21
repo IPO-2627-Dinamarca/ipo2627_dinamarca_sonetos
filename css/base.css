@@ -1,3 +1,6 @@
+/* BASE: reinicio mínimo, estilos por defecto de la página y accesibilidad
+   (foco visible y enlace "Saltar al soneto").
+   :where() deja la especificidad a 0 para que cualquier componente la supere. */
 @layer base {
   *,
   *::before,
@@ -40,7 +43,7 @@
   }
 
   :focus-visible {
-    outline: 3px solid var(--interaccion);
+    outline: 3px solid var(--color-complementario);
     outline-offset: 2px;
   }
 
@@ -54,24 +57,12 @@
     top: -4rem;
     padding: var(--espacio-2) var(--espacio-3);
     background: var(--superficie);
-    border: 1px solid var(--interaccion);
+    border: 1px solid var(--color-complementario);
     border-radius: var(--radio);
     z-index: 10;
   }
 
   .salto:focus {
     top: var(--espacio-3);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    html {
-      scroll-behavior: auto;
-    }
-
-    *,
-    *::before,
-    *::after {
-      transition-duration: 0.01ms !important;
-    }
   }
 }

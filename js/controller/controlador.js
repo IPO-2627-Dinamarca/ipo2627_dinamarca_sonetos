@@ -1,3 +1,6 @@
+// CONTROLADOR: recibe los eventos de la vista, consulta o modifica el modelo y
+// le dice a la vista qué mostrar. El soneto actual se refleja en el hash de la URL
+// (#id), así funcionan los botones Atrás/Adelante y se puede enlazar un soneto.
 import { TAMANO_MAX, TAMANO_MIN, TAMANO_PASO } from "../model/preferencias.js";
 
 export class Controlador {
@@ -37,8 +40,11 @@ export class Controlador {
 
   #mostrarDesdeHash(enfocar) {
     const id = decodeURIComponent(location.hash.slice(1));
-    const soneto = this.#almacen.obtener(id) ?? this.#almacen.porIndice(0);
-    this.#mostrar(soneto, enfocar);
+    const soneto = this.#almacen.obtener(id);
+    // Un hash que no es un soneto (p. ej. #lectura del enlace "Saltar al soneto")
+    // es un ancla de la página: se deja el soneto que ya se estaba leyendo.
+    if (id && !soneto && this.#actual) return;
+    this.#mostrar(soneto ?? this.#almacen.porIndice(0), enfocar);
   }
 
   #mostrar(soneto, enfocar) {
