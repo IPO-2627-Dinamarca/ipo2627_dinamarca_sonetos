@@ -1,82 +1,70 @@
-// CONTROLADOR: recibe los eventos de la vista, consulta o modifica el modelo y
-// le dice a la vista qué mostrar. El soneto actual se refleja en el hash de la URL
-// (#id), así funcionan los botones Atrás/Adelante y se puede enlazar un soneto.
-import { TAMANO_MAX, TAMANO_MIN, TAMANO_PASO } from "../model/preferencias.js";
+// CONTROLADOR: recibe los eventos de la vista, consulta el modelo y le dice a la
+// vista qué mostrar. Guarda el estado de la lectura: soneto actual, tamaño y tema.
+const TAMANO_MIN = 1;
+const TAMANO_MAX = 1.75;
+const TAMANO_PASO = 0.25;
 
 export class Controlador {
   #almacen;
-  #preferencias;
   #vista;
-  #actual = null;
+  #actual;
+  #tamano = 1.25;
+  #oscuro;
 
-  constructor(almacen, preferencias, vista) {
+  constructor(almacen, vista) {
     this.#almacen = almacen;
-    this.#preferencias = preferencias;
     this.#vista = vista;
   }
 
   iniciar() {
     this.#vista.renderIndice(this.#almacen.listar());
-    this.#aplicarPreferencias();
+    this.#mostrar(this.#almacen.porIndice(0));
 
-    this.#vista.alSeleccionar((id) => {
-      location.hash = id;
-    });
-    this.#vista.alPulsarAccion((accion) => this.#ejecutar(accion));
+    this.#oscuro = this.#vista.sistemaEnOscuro();
+    this.#vista.aplicarTema(this.#oscuro);
+    this.#vista.aplicarTamano(this.#tamano, TAMANO_MIN, TAMANO_MAX);
+
+    this.#vista.alPulsar((accion, id) => this.#ejecutar(accion, id));
     this.#vista.alTeclear((tecla) => {
       if (tecla === "ArrowLeft") this.#ejecutar("anterior");
       if (tecla === "ArrowRight") this.#ejecutar("siguiente");
     });
-
-    addEventListener("hashchange", () => this.#mostrarDesdeHash(true));
-    this.#mostrarDesdeHash(false);
   }
 
-  #aplicarPreferencias() {
-    this.#vista.aplicarTema(this.#preferencias.tema);
-    this.#vista.aplicarTamano(this.#preferencias.tamano, { minimo: TAMANO_MIN, maximo: TAMANO_MAX });
-    this.#vista.aplicarNumeracion(this.#preferencias.numeracion);
-  }
-
-  #mostrarDesdeHash(enfocar) {
-    const id = decodeURIComponent(location.hash.slice(1));
-    const soneto = this.#almacen.obtener(id);
-    // Un hash que no es un soneto (p. ej. #lectura del enlace "Saltar al soneto")
-    // es un ancla de la página: se deja el soneto que ya se estaba leyendo.
-    if (id && !soneto && this.#actual) return;
-    this.#mostrar(soneto ?? this.#almacen.porIndice(0), enfocar);
-  }
-
-  #mostrar(soneto, enfocar) {
+  #mostrar(soneto) {
     this.#actual = soneto;
-    this.#vista.mostrarSoneto(soneto, this.#almacen.indiceDe(soneto.id), this.#almacen.listar().length);
-    if (enfocar) this.#vista.enfocarTitulo();
+    this.#vista.mostrarSoneto(soneto, this.#almacen.indiceDe(soneto), this.#almacen.total());
   }
 
-  #ejecutar(accion) {
+  #ejecutar(accion, id) {
+    const posicion = this.#almacen.indiceDe(this.#actual);
+
     switch (accion) {
+      case "ver":
+        this.#mostrar(this.#almacen.obtener(id));
+        this.#vista.llevarAlSoneto();
+        break;
       case "anterior":
-      case "siguiente": {
-        const desplazamiento = accion === "anterior" ? -1 : 1;
-        const destino = this.#almacen.porIndice(this.#almacen.indiceDe(this.#actual.id) + desplazamiento);
-        location.hash = destino.id;
+        this.#mostrar(this.#almacen.porIndice(posicion - 1));
         break;
-      }
+      case "siguiente":
+        this.#mostrar(this.#almacen.porIndice(posicion + 1));
+        break;
       case "tamano-menos":
-      case "tamano-mas": {
-        const paso = accion === "tamano-mas" ? TAMANO_PASO : -TAMANO_PASO;
-        this.#preferencias.tamano = this.#preferencias.tamano + paso;
-        this.#vista.aplicarTamano(this.#preferencias.tamano, { minimo: TAMANO_MIN, maximo: TAMANO_MAX });
+        this.#cambiarTamano(-TAMANO_PASO);
         break;
-      }
-      case "numeracion":
-        this.#preferencias.numeracion = !this.#preferencias.numeracion;
-        this.#vista.aplicarNumeracion(this.#preferencias.numeracion);
+      case "tamano-mas":
+        this.#cambiarTamano(TAMANO_PASO);
         break;
       case "tema":
-        this.#preferencias.tema = this.#vista.temaEfectivo() === "oscuro" ? "claro" : "oscuro";
-        this.#vista.aplicarTema(this.#preferencias.tema);
+        this.#oscuro = !this.#oscuro;
+        this.#vista.aplicarTema(this.#oscuro);
         break;
     }
+  }
+
+  #cambiarTamano(paso) {
+    this.#tamano = Math.min(TAMANO_MAX, Math.max(TAMANO_MIN, this.#tamano + paso));
+    this.#vista.aplicarTamano(this.#tamano, TAMANO_MIN, TAMANO_MAX);
   }
 }

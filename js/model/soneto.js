@@ -1,20 +1,9 @@
 // MODELO: un soneto (título, autor y 14 versos). Comprueba que tiene 14 versos
 // y los agrupa en su estructura fija: dos cuartetos y dos tercetos.
-const ESTRUCTURA = [
-  { tipo: "cuarteto", versos: 4 },
-  { tipo: "cuarteto", versos: 4 },
-  { tipo: "terceto", versos: 3 },
-  { tipo: "terceto", versos: 3 },
-];
-
-const TOTAL_VERSOS = ESTRUCTURA.reduce((suma, { versos }) => suma + versos, 0);
-
 export class Soneto {
   constructor({ id, titulo, autor, versos }) {
-    if (versos.length !== TOTAL_VERSOS) {
-      throw new Error(
-        `El soneto "${titulo}" tiene ${versos.length} versos; debe tener ${TOTAL_VERSOS}.`,
-      );
+    if (versos.length !== 14) {
+      throw new Error(`El soneto "${titulo}" tiene ${versos.length} versos; debe tener 14.`);
     }
     this.id = id;
     this.titulo = titulo;
@@ -23,11 +12,11 @@ export class Soneto {
   }
 
   get estrofas() {
-    let inicio = 0;
-    return ESTRUCTURA.map(({ tipo, versos }) => {
-      const estrofa = { tipo, inicio: inicio + 1, versos: this.versos.slice(inicio, inicio + versos) };
-      inicio += versos;
-      return estrofa;
-    });
+    return [
+      { nombre: "Primer cuarteto", versos: this.versos.slice(0, 4) },
+      { nombre: "Segundo cuarteto", versos: this.versos.slice(4, 8) },
+      { nombre: "Primer terceto", versos: this.versos.slice(8, 11) },
+      { nombre: "Segundo terceto", versos: this.versos.slice(11, 14) },
+    ];
   }
 }

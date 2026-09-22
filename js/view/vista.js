@@ -1,6 +1,6 @@
 // VISTA: única parte que toca el DOM y el CSSOM. Pinta el índice y el soneto,
-// aplica las preferencias (atributo data-tema, clase con-numeracion y la variable
-// CSS --tamano-lectura) y avisa al controlador de lo que hace el usuario.
+// aplica el tema (atributo data-tema) y el tamaño (variable CSS --tamano-lectura)
+// y avisa al controlador de lo que hace el usuario.
 // Los elementos se localizan por atributos data-vista / data-accion, no por clases
 // de estilo, para que cambiar el CSS no rompa el JS.
 const raiz = document.documentElement;
@@ -12,18 +12,17 @@ export class Vista {
   #soneto = $('[data-vista="soneto"]');
   #posicion = $('[data-vista="posicion"]');
   #botonTema = $('[data-accion="tema"]');
-  #botonNumeracion = $('[data-accion="numeracion"]');
   #botonMenos = $('[data-accion="tamano-menos"]');
   #botonMas = $('[data-accion="tamano-mas"]');
 
   renderIndice(sonetos) {
     this.#indice.replaceChildren(
       ...sonetos.map(({ id, titulo, autor }) => {
-        const enlace = document.createElement("a");
-        enlace.className = "indice__enlace";
-        enlace.href = `#${id}`;
-        enlace.dataset.id = id;
-        enlace.dataset.vista = "enlace-soneto";
+        const boton = document.createElement("button");
+        boton.type = "button";
+        boton.className = "indice__enlace";
+        boton.dataset.accion = "ver";
+        boton.dataset.id = id;
 
         const nombre = document.createElement("span");
         nombre.className = "indice__nombre";
@@ -33,23 +32,21 @@ export class Vista {
         firma.className = "indice__autor";
         firma.textContent = autor;
 
-        enlace.append(nombre, firma);
+        boton.append(nombre, firma);
 
         const item = document.createElement("li");
-        item.append(enlace);
+        item.append(boton);
         return item;
       }),
     );
   }
 
-  mostrarSoneto(soneto, indice, total) {
+  mostrarSoneto(soneto, posicion, total) {
     const cabecera = document.createElement("header");
     cabecera.className = "soneto__cabecera";
 
-    const titulo = document.createElement("h1");
+    const titulo = document.createElement("h2");
     titulo.className = "soneto__titulo";
-    titulo.tabIndex = -1;
-    titulo.dataset.vista = "titulo-soneto";
     titulo.textContent = soneto.titulo;
 
     const autor = document.createElement("p");
@@ -60,31 +57,27 @@ export class Vista {
 
     const cuerpo = document.createElement("div");
     cuerpo.className = "soneto__cuerpo";
-    cuerpo.append(...soneto.estrofas.map((estrofa, i) => this.#crearEstrofa(estrofa, i)));
+    cuerpo.append(...soneto.estrofas.map((estrofa) => this.#crearEstrofa(estrofa)));
 
     this.#soneto.replaceChildren(cabecera, cuerpo);
-    this.#posicion.textContent = `${indice + 1} de ${total}`;
+    this.#posicion.textContent = `${posicion + 1} de ${total}`;
     this.#marcarActivo(soneto.id);
-    document.title = `${soneto.titulo} · ${soneto.autor} · Sonetos`;
+    document.title = `${soneto.titulo} · Sonetos`;
   }
 
-  enfocarTitulo() {
-    this.#soneto.querySelector('[data-vista="titulo-soneto"]')?.focus({ preventScroll: true });
-    const sinAnimacion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    this.#soneto.scrollIntoView({ block: "start", behavior: sinAnimacion ? "auto" : "smooth" });
+  llevarAlSoneto() {
+    this.#soneto.scrollIntoView({ block: "nearest" });
   }
 
-  #crearEstrofa({ tipo, inicio, versos }, posicion) {
+  #crearEstrofa({ nombre, versos }) {
     const estrofa = document.createElement("section");
     estrofa.className = "estrofa";
-    estrofa.dataset.tipo = tipo;
-    estrofa.setAttribute("aria-label", `${tipo === "cuarteto" ? "Cuarteto" : "Terceto"} ${posicion < 2 ? posicion + 1 : posicion - 1}`);
+    estrofa.setAttribute("aria-label", nombre);
 
     estrofa.append(
-      ...versos.map((texto, i) => {
+      ...versos.map((texto) => {
         const verso = document.createElement("p");
         verso.className = "verso";
-        verso.dataset.numero = inicio + i;
         verso.textContent = texto;
         return verso;
       }),
@@ -93,61 +86,39 @@ export class Vista {
   }
 
   #marcarActivo(id) {
-    this.#indice.querySelectorAll('[data-vista="enlace-soneto"]').forEach((enlace) => {
-      if (enlace.dataset.id === id) {
-        enlace.setAttribute("aria-current", "true");
+    this.#indice.querySelectorAll('[data-accion="ver"]').forEach((boton) => {
+      if (boton.dataset.id === id) {
+        boton.setAttribute("aria-current", "true");
       } else {
-        enlace.removeAttribute("aria-current");
+        boton.removeAttribute("aria-current");
       }
     });
   }
 
-  aplicarTema(tema) {
-    if (tema) {
-      raiz.dataset.tema = tema;
-    } else {
-      delete raiz.dataset.tema;
-    }
-    this.#botonTema.setAttribute("aria-pressed", String(this.temaEfectivo() === "oscuro"));
+  sistemaEnOscuro() {
+    return matchMedia("(prefers-color-scheme: dark)").matches;
   }
 
-  temaEfectivo() {
-    if (raiz.dataset.tema) return raiz.dataset.tema;
-    return matchMedia("(prefers-color-scheme: dark)").matches ? "oscuro" : "claro";
+  aplicarTema(oscuro) {
+    raiz.dataset.tema = oscuro ? "oscuro" : "claro";
+    this.#botonTema.setAttribute("aria-pressed", String(oscuro));
   }
 
-  aplicarTamano(rem, { minimo, maximo }) {
+  aplicarTamano(rem, minimo, maximo) {
     raiz.style.setProperty("--tamano-lectura", `${rem}rem`);
     this.#botonMenos.disabled = rem <= minimo;
     this.#botonMas.disabled = rem >= maximo;
   }
 
-  aplicarNumeracion(activa) {
-    raiz.classList.toggle("con-numeracion", activa);
-    this.#botonNumeracion.setAttribute("aria-pressed", String(activa));
-  }
-
-  alSeleccionar(manejador) {
-    this.#indice.addEventListener("click", (evento) => {
-      const enlace = evento.target.closest('[data-vista="enlace-soneto"]');
-      if (!enlace) return;
-      evento.preventDefault();
-      manejador(enlace.dataset.id);
-    });
-  }
-
-  alPulsarAccion(manejador) {
+  // Un solo escuchador en document atiende todos los botones (delegación de eventos).
+  alPulsar(manejador) {
     document.addEventListener("click", (evento) => {
       const boton = evento.target.closest("[data-accion]");
-      if (boton && !boton.disabled) manejador(boton.dataset.accion);
+      if (boton) manejador(boton.dataset.accion, boton.dataset.id);
     });
   }
 
   alTeclear(manejador) {
-    document.addEventListener("keydown", (evento) => {
-      if (evento.altKey || evento.ctrlKey || evento.metaKey) return;
-      if (evento.target.closest("input, textarea, select")) return;
-      manejador(evento.key);
-    });
+    document.addEventListener("keydown", (evento) => manejador(evento.key));
   }
 }

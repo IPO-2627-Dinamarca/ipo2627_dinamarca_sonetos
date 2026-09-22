@@ -1,5 +1,5 @@
 // MODELO: almacén de sonetos. Guarda la colección y permite buscar por id o por
-// posición (porIndice da la vuelta al llegar al final o al principio).
+// posición (porIndice da la vuelta al pasar del último o antes del primero).
 import { Soneto } from "./soneto.js";
 
 export class Almacen {
@@ -10,19 +10,24 @@ export class Almacen {
   }
 
   listar() {
-    return [...this.#sonetos];
+    return this.#sonetos;
+  }
+
+  total() {
+    return this.#sonetos.length;
   }
 
   obtener(id) {
-    return this.#sonetos.find((soneto) => soneto.id === id) ?? null;
+    return this.#sonetos.find((soneto) => soneto.id === id);
   }
 
-  indiceDe(id) {
-    return this.#sonetos.findIndex((soneto) => soneto.id === id);
+  indiceDe(soneto) {
+    return this.#sonetos.indexOf(soneto);
   }
 
   porIndice(indice) {
-    const total = this.#sonetos.length;
-    return this.#sonetos[((indice % total) + total) % total];
+    if (indice < 0) return this.#sonetos[this.total() - 1];
+    if (indice >= this.total()) return this.#sonetos[0];
+    return this.#sonetos[indice];
   }
 }

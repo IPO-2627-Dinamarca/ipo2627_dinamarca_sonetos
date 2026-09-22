@@ -9,7 +9,6 @@
   }
 
   html {
-    -webkit-text-size-adjust: 100%;
     scroll-padding-top: var(--espacio-4);
   }
 
@@ -45,10 +44,6 @@
   :focus-visible {
     outline: 3px solid var(--color-complementario);
     outline-offset: 2px;
-  }
-
-  h1:focus {
-    outline: none;
   }
 
   .salto {

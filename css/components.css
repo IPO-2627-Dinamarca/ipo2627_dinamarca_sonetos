@@ -74,8 +74,13 @@
   .indice__enlace {
     display: flex;
     flex-direction: column;
+    width: 100%;
     padding: var(--espacio-2) var(--espacio-3);
+    background: none;
+    border: 0;
     border-left: 3px solid transparent;
+    text-align: start;
+    cursor: pointer;
     border-radius: 0 var(--radio) var(--radio) 0;
     transition: background-color var(--duracion), border-color var(--duracion);
 
@@ -145,22 +150,10 @@
     line-height: 1.55;
   }
 
+  /* Si un verso no cabe en una línea, lo que sobra queda sangrado. */
   .verso {
-    position: relative;
     padding-left: 2ch;
     text-indent: -2ch;
-  }
-
-  .con-numeracion .verso::before {
-    content: attr(data-numero);
-    position: absolute;
-    right: 100%;
-    margin-right: var(--espacio-2);
-    text-indent: 0;
-    font-family: var(--fuente-interfaz);
-    font-size: 0.75rem;
-    line-height: calc(var(--tamano-lectura) * 1.55);
-    color: var(--texto-suave);
   }
 
   /* Navegación entre sonetos */

@@ -57,7 +57,7 @@ css/
 js/
   main.js               punto de entrada: une modelo, vista y controlador
   data/sonetos.js       los cinco sonetos
-  model/                MODELO: Soneto, Almacen, Preferencias
+  model/                MODELO: Soneto y Almacen
   view/vista.js         VISTA: la única que toca el DOM
   controller/           CONTROLADOR: une eventos, modelo y vista
 sonetos/                textos originales de los sonetos
@@ -65,9 +65,9 @@ sonetos/                textos originales de los sonetos
 
 ## Arquitectura MVC
 
-- **Modelo** (`js/model/`): `Soneto` comprueba que hay 14 versos y los agrupa en 2 cuartetos y 2 tercetos; `Almacen` guarda la colección; `Preferencias` recuerda tema, tamaño y numeración en `localStorage`.
-- **Vista** (`js/view/vista.js`): crea los elementos del índice y del soneto y aplica las preferencias. No toma decisiones; avisa al controlador.
-- **Controlador** (`js/controller/controlador.js`): decide qué soneto mostrar y qué hacer con cada botón o tecla.
+- **Modelo** (`js/model/`): `Soneto` comprueba que hay 14 versos y los agrupa en 2 cuartetos y 2 tercetos; `Almacen` guarda la colección y permite buscar un soneto por id o por posición.
+- **Vista** (`js/view/vista.js`): crea los elementos del índice y del soneto y aplica el tema y el tamaño del texto. No toma decisiones; avisa al controlador.
+- **Controlador** (`js/controller/controlador.js`): guarda el estado de la lectura (soneto actual, tamaño y tema) y decide qué hacer con cada botón o tecla.
 - HTML, CSS y JS se vinculan con `<link>` y `<script type="module">`; los módulos se cargan sin bloquear la página y cada archivo importa solo lo que necesita.
 
 ## Estilística
@@ -79,13 +79,14 @@ sonetos/                textos originales de los sonetos
 ## Interacción y usabilidad
 
 - Índice de sonetos, botones Anterior/Siguiente y flechas ← → del teclado.
-- Cada soneto tiene su URL (`#id`): funcionan Atrás/Adelante y se puede enlazar.
-- Ajustes de lectura: tamaño del texto (A− / A+), numeración de versos y modo oscuro. Se recuerdan entre visitas.
+- El índice marca el soneto que se está leyendo y el texto «1 de 5» indica la posición. Del último se pasa al primero y al revés.
+- Ajustes de lectura: tamaño del texto (A− / A+, con límites) y modo oscuro. Al abrir la página se respeta el tema del sistema.
+- En móvil el soneto va antes que el índice; al elegir uno en el índice, la página sube hasta el soneto.
 - Accesibilidad: enlace "Saltar al soneto", foco visible, `aria-pressed` y `aria-current` para los estados, botones de al menos 44 px y respeto a `prefers-reduced-motion`.
 
 ## Buenas prácticas
 
-- **HTML semántico**: `header`, `nav`, `main`, `article` para el soneto, una `section` por estrofa y un `p` por verso.
+- **HTML semántico**: `header`, `nav`, `main` y `footer`; un único `h1` y `h2` para los apartados; `article` para el soneto, una `section` por estrofa (con su nombre: «Primer cuarteto»…) y un `p` por verso.
 - **CSS moderno**: capas `@layer` para controlar la cascada, `:where()` para no subir la especificidad, nombres de clase tipo BEM y anidamiento nativo.
 - **JS ↔ DOM**: la vista localiza los elementos por `data-vista` y `data-accion`, no por clases de estilo, y un solo escuchador en `document` atiende todos los botones (delegación de eventos).
-- **JS ↔ CSSOM**: el JS no escribe estilos sueltos. Solo cambia la variable `--tamano-lectura`, el atributo `data-tema` y la clase `con-numeracion`; el CSS decide cómo se ve.
+- **JS ↔ CSSOM**: el JS no escribe estilos sueltos. Solo cambia la variable `--tamano-lectura` y el atributo `data-tema`; el CSS decide cómo se ve.
