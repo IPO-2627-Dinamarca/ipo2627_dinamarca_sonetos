@@ -1,17 +1,9 @@
 /* COMPONENTES: aspecto de cada pieza, con nombres de clase tipo BEM (bloque__elemento)
    y anidamiento CSS nativo (&) para los estados (hover, pulsado, desactivado).
-   Los estados se leen de atributos ARIA (aria-pressed, aria-current), así el
+   Los estados se leen de atributos ARIA (aria-pressed, aria-current, aria-disabled), así el
    estilo y la accesibilidad no se pueden desincronizar. */
 @layer componentes {
-  /* Enlace "Saltar al soneto": solo se ve cuando recibe el foco con el teclado. */
-  .salto:not(:focus) {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-  }
-
+  /* Enlace "Saltar al soneto": oculto (ver base.css) hasta que recibe el foco. */
   .salto {
     position: absolute;
     left: var(--espacio-3);
@@ -88,7 +80,7 @@
   .indice__titulo {
     font-size: var(--texto-pequeno);
     font-weight: var(--peso-seminegrita);
-    letter-spacing: var(--espaciado-versalitas);
+    letter-spacing: var(--espaciado-mayusculas);
     text-transform: uppercase;
     color: var(--texto-suave);
   }
@@ -114,7 +106,7 @@
 
     &:hover {
       border-left-color: var(--texto-suave);
-      background: var(--color-complementario-fondo);
+      background: var(--superficie);
     }
 
     &[aria-current="true"] {

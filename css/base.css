@@ -40,8 +40,10 @@
     outline-offset: 2px;
   }
 
-  /* Texto que no se ve pero sí lee el lector de pantalla (avisos, nombre de estrofa). */
-  .solo-lector {
+  /* Texto que no se ve pero sí lee el lector de pantalla (avisos, nombre de estrofa)
+     y enlace "Saltar al soneto" mientras no tiene el foco. */
+  .solo-lector,
+  .salto:not(:focus) {
     position: absolute;
     width: 1px;
     height: 1px;

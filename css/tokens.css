@@ -10,7 +10,7 @@
   - Complementario (verde azulado): reservado a lo interactivo (foco, elemento activo).
   - Neutros: el mismo tono base con muy poca saturación (fondo y texto), sin negro ni blanco puros.
     Así la paleta solo tiene dos tonos: el base y su complementario.
-  Los bordes de los controles llegan a 3:1 sobre la superficie (WCAG 1.4.11).
+  Los bordes de los controles llegan a 3:1 sobre el fondo y sobre la superficie (WCAG 1.4.11).
   Modo claro/oscuro con light-dark(); el atributo data-tema lo fuerza vía color-scheme.
   Todos los pares texto/fondo cumplen contraste WCAG AA (≥ 4,5:1).
 
@@ -23,7 +23,7 @@
   ESTRATEGIA ESPACIAL
   - Espaciado en rem: desde 1rem crece con razón 1,5 (1 → 1,5 → 2,25 → 3,375)
     y hacia abajo se divide entre 2 (0,5 → 0,25). Medida de lectura en ch.
-  - Figura/fondo: la superficie del soneto es casi blanca sobre un fondo más oscuro.
+  - Figura/fondo: la superficie del soneto es más clara que el fondo y lleva borde.
   - Gestalt: proximidad (estrofas separadas, versos juntos), similitud (mismo
     estilo para cuartetos y tercetos), cierre (marco del soneto), figura/fondo.
 */
@@ -31,13 +31,14 @@
   :root {
     color-scheme: light dark;
 
+    /* Cromático */
     --matiz-primario: 350;
     --matiz-complementario: calc(var(--matiz-primario) + 180);
     --matiz-neutro: var(--matiz-primario);
 
     --fondo: light-dark(hsl(var(--matiz-neutro), 12%, 88%), hsl(var(--matiz-neutro), 8%, 9%));
     --superficie: light-dark(hsl(var(--matiz-neutro), 10%, 99%), hsl(var(--matiz-neutro), 8%, 18%));
-    --borde: light-dark(hsl(var(--matiz-neutro), 8%, 55%), hsl(var(--matiz-neutro), 6%, 50%));
+    --borde: light-dark(hsl(var(--matiz-neutro), 8%, 50%), hsl(var(--matiz-neutro), 6%, 50%));
     --texto: light-dark(hsl(var(--matiz-neutro), 12%, 14%), hsl(var(--matiz-neutro), 15%, 90%));
     --texto-suave: light-dark(hsl(var(--matiz-neutro), 8%, 32%), hsl(var(--matiz-neutro), 8%, 72%));
 
@@ -45,6 +46,7 @@
     --color-complementario: light-dark(hsl(var(--matiz-complementario), 70%, 22%), hsl(var(--matiz-complementario), 50%, 72%));
     --color-complementario-fondo: light-dark(hsl(var(--matiz-complementario), 40%, 84%), hsl(var(--matiz-complementario), 30%, 21%));
 
+    /* Tipográfico */
     --fuente-poetica: "Palatino Linotype", Palatino, Georgia, serif;
     --fuente-interfaz: system-ui, -apple-system, "Segoe UI", sans-serif;
 
@@ -63,8 +65,9 @@
     --interlineado-titulo: 1.1;
     --interlineado-compacto: 1.25;
     --interlineado-texto: 1.6;
-    --espaciado-versalitas: 0.12em;
+    --espaciado-mayusculas: 0.12em;
 
+    /* Espacial */
     --espacio-1: 0.25rem;
     --espacio-2: 0.5rem;
     --espacio-3: 1rem;

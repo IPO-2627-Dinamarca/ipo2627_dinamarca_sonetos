@@ -24,9 +24,9 @@
       <p class="cabecera__lema">Catorce versos, cuatro estrofas</p>
 
       <div class="ajustes" role="group" aria-label="Ajustes de lectura">
-        <button type="button" class="boton" data-accion="tamano-menos" aria-label="Reducir tamaño del texto">A−</button>
-        <button type="button" class="boton" data-accion="tamano-mas" aria-label="Aumentar tamaño del texto">A+</button>
-        <button type="button" class="boton" data-accion="tema" aria-pressed="false">Modo oscuro</button>
+        <button type="button" class="boton" disabled data-accion="tamano-menos" aria-label="Reducir tamaño del texto">A−</button>
+        <button type="button" class="boton" disabled data-accion="tamano-mas" aria-label="Aumentar tamaño del texto">A+</button>
+        <button type="button" class="boton" disabled data-accion="tema" aria-pressed="false">Modo oscuro</button>
       </div>
     </header>
 
@@ -41,9 +41,9 @@
       </article>
 
       <nav class="pasar" aria-label="Navegación entre sonetos">
-        <button type="button" class="boton" data-accion="anterior">← Anterior</button>
+        <button type="button" class="boton" disabled data-accion="anterior">← Anterior</button>
         <p class="pasar__posicion" data-vista="posicion"></p>
-        <button type="button" class="boton" data-accion="siguiente">Siguiente →</button>
+        <button type="button" class="boton" disabled data-accion="siguiente">Siguiente →</button>
       </nav>
     </main>
 

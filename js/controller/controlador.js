@@ -31,6 +31,7 @@ export class Controlador {
       this.#oscuro = oscuro;
       this.#vista.aplicarTema(oscuro);
     });
+    this.#vista.activarControles();
     this.#vista.alPulsar((accion, id) => this.#ejecutar(accion, id));
     this.#vista.alTeclear((tecla) => {
       if (tecla === "ArrowLeft") this.#ejecutar("anterior");
@@ -59,6 +60,7 @@ export class Controlador {
         const soneto = this.#almacen.obtener(id);
         if (!soneto) return;
         this.#mostrar(soneto);
+        this.#vista.anunciar(); // vacía el aviso anterior: el lector ya lee el título enfocado
         this.#vista.llevarAlSoneto();
         break;
       }

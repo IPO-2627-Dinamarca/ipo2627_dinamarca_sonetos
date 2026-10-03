@@ -69,8 +69,15 @@ export class Vista {
   }
 
   // Mensaje para el lector de pantalla (región aria-live oculta).
-  anunciar(texto) {
-    this.#aviso.textContent = texto;
+  // Se vacía antes para que se anuncie aunque el texto se repita.
+  anunciar(texto = "") {
+    this.#aviso.textContent = "";
+    if (texto) requestAnimationFrame(() => (this.#aviso.textContent = texto));
+  }
+
+  // Los botones vienen desactivados en el HTML hasta que el controlador arranca.
+  activarControles() {
+    document.querySelectorAll("[data-accion]").forEach((boton) => (boton.disabled = false));
   }
 
   mostrarError(mensaje) {
@@ -83,9 +90,12 @@ export class Vista {
   }
 
   // Lleva la vista y el foco al soneto (el lector de pantalla lee su título).
+  // Solo desplaza si el título no está ya a la vista (en escritorio no mueve la página).
   llevarAlSoneto() {
-    this.#soneto.scrollIntoView({ block: "start" });
-    this.#soneto.querySelector("h2")?.focus({ preventScroll: true });
+    const titulo = this.#soneto.querySelector("h2");
+    const { top, bottom } = titulo.getBoundingClientRect();
+    if (top < 0 || bottom > innerHeight) this.#soneto.scrollIntoView({ block: "start" });
+    titulo.focus({ preventScroll: true });
   }
 
   #crearEstrofa({ nombre, versos }) {
@@ -135,7 +145,9 @@ export class Vista {
 
   // Tamaño inicial definido en el CSS (tokens.css), para no repetirlo en el JS.
   tamanoInicial() {
-    return parseFloat(getComputedStyle(raiz).getPropertyValue("--tamano-lectura"));
+    const valor = getComputedStyle(raiz).getPropertyValue("--tamano-lectura").trim();
+    if (!valor.endsWith("rem")) throw new Error(`--tamano-lectura debe ir en rem (vale "${valor}").`);
+    return parseFloat(valor);
   }
 
   // aria-disabled (y no disabled) para que el botón conserve el foco al llegar al límite.
@@ -155,7 +167,7 @@ export class Vista {
 
   alTeclear(manejador) {
     document.addEventListener("keydown", (evento) => {
-      // Alt/Ctrl/Meta + flecha son atajos del navegador; mantener pulsada no recorre la lista.
+      // Alt/Ctrl/Meta/Mayús + flecha son atajos del navegador; mantener pulsada no recorre la lista.
       if (evento.altKey || evento.ctrlKey || evento.metaKey || evento.shiftKey || evento.repeat) return;
       manejador(evento.key);
     });
