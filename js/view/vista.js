@@ -4,6 +4,7 @@
 // Los elementos se localizan por atributos data-vista / data-accion, no por clases
 // de estilo, para que cambiar el CSS no rompa el JS.
 const raiz = document.documentElement;
+const oscuroSistema = matchMedia("(prefers-color-scheme: dark)");
 
 const $ = (selector) => document.querySelector(selector);
 
@@ -11,6 +12,7 @@ export class Vista {
   #indice = $('[data-vista="indice"]');
   #soneto = $('[data-vista="soneto"]');
   #posicion = $('[data-vista="posicion"]');
+  #aviso = $('[data-vista="aviso"]');
   #botonTema = $('[data-accion="tema"]');
   #botonMenos = $('[data-accion="tamano-menos"]');
   #botonMas = $('[data-accion="tamano-mas"]');
@@ -20,7 +22,7 @@ export class Vista {
       ...sonetos.map(({ id, titulo, autor }) => {
         const boton = document.createElement("button");
         boton.type = "button";
-        boton.className = "indice__enlace";
+        boton.className = "indice__boton";
         boton.dataset.accion = "ver";
         boton.dataset.id = id;
 
@@ -47,6 +49,7 @@ export class Vista {
 
     const titulo = document.createElement("h2");
     titulo.className = "soneto__titulo";
+    titulo.tabIndex = -1; // para poder llevarle el foco al elegir en el índice
     titulo.textContent = soneto.titulo;
 
     const autor = document.createElement("p");
@@ -65,19 +68,40 @@ export class Vista {
     document.title = `${soneto.titulo} · Sonetos`;
   }
 
+  // Mensaje para el lector de pantalla (región aria-live oculta).
+  anunciar(texto) {
+    this.#aviso.textContent = texto;
+  }
+
+  mostrarError(mensaje) {
+    const aviso = document.createElement("p");
+    aviso.setAttribute("role", "alert");
+    aviso.textContent = mensaje;
+    this.#soneto.replaceChildren(aviso);
+    // Sin datos los botones no harían nada: se desactivan para no engañar al usuario.
+    document.querySelectorAll("[data-accion]").forEach((boton) => (boton.disabled = true));
+  }
+
+  // Lleva la vista y el foco al soneto (el lector de pantalla lee su título).
   llevarAlSoneto() {
-    this.#soneto.scrollIntoView({ block: "nearest" });
+    this.#soneto.scrollIntoView({ block: "start" });
+    this.#soneto.querySelector("h2")?.focus({ preventScroll: true });
   }
 
   #crearEstrofa({ nombre, versos }) {
     const estrofa = document.createElement("section");
-    estrofa.className = "estrofa";
-    estrofa.setAttribute("aria-label", nombre);
+    estrofa.className = "soneto__estrofa";
+
+    // Encabezado de la estrofa solo para el lector de pantalla («Primer cuarteto»…).
+    const encabezado = document.createElement("h3");
+    encabezado.className = "solo-lector";
+    encabezado.textContent = nombre;
 
     estrofa.append(
+      encabezado,
       ...versos.map((texto) => {
         const verso = document.createElement("p");
-        verso.className = "verso";
+        verso.className = "soneto__verso";
         verso.textContent = texto;
         return verso;
       }),
@@ -96,7 +120,12 @@ export class Vista {
   }
 
   sistemaEnOscuro() {
-    return matchMedia("(prefers-color-scheme: dark)").matches;
+    return oscuroSistema.matches;
+  }
+
+  // Avisa cuando el sistema cambia entre modo claro y oscuro.
+  alCambiarTemaSistema(manejador) {
+    oscuroSistema.addEventListener("change", (evento) => manejador(evento.matches));
   }
 
   aplicarTema(oscuro) {
@@ -104,10 +133,16 @@ export class Vista {
     this.#botonTema.setAttribute("aria-pressed", String(oscuro));
   }
 
-  aplicarTamano(rem, minimo, maximo) {
+  // Tamaño inicial definido en el CSS (tokens.css), para no repetirlo en el JS.
+  tamanoInicial() {
+    return parseFloat(getComputedStyle(raiz).getPropertyValue("--tamano-lectura"));
+  }
+
+  // aria-disabled (y no disabled) para que el botón conserve el foco al llegar al límite.
+  aplicarTamano(rem, puedeReducir, puedeAumentar) {
     raiz.style.setProperty("--tamano-lectura", `${rem}rem`);
-    this.#botonMenos.disabled = rem <= minimo;
-    this.#botonMas.disabled = rem >= maximo;
+    this.#botonMenos.setAttribute("aria-disabled", String(!puedeReducir));
+    this.#botonMas.setAttribute("aria-disabled", String(!puedeAumentar));
   }
 
   // Un solo escuchador en document atiende todos los botones (delegación de eventos).
@@ -119,6 +154,10 @@ export class Vista {
   }
 
   alTeclear(manejador) {
-    document.addEventListener("keydown", (evento) => manejador(evento.key));
+    document.addEventListener("keydown", (evento) => {
+      // Alt/Ctrl/Meta + flecha son atajos del navegador; mantener pulsada no recorre la lista.
+      if (evento.altKey || evento.ctrlKey || evento.metaKey || evento.shiftKey || evento.repeat) return;
+      manejador(evento.key);
+    });
   }
 }

@@ -8,8 +8,9 @@ export class Controlador {
   #almacen;
   #vista;
   #actual;
-  #tamano = 1.25;
+  #tamano;
   #oscuro;
+  #temaElegido = false; // true cuando el usuario pulsa el botón: deja de seguir al sistema
 
   constructor(almacen, vista) {
     this.#almacen = almacen;
@@ -20,10 +21,16 @@ export class Controlador {
     this.#vista.renderIndice(this.#almacen.listar());
     this.#mostrar(this.#almacen.porIndice(0));
 
+    this.#tamano = this.#vista.tamanoInicial();
     this.#oscuro = this.#vista.sistemaEnOscuro();
     this.#vista.aplicarTema(this.#oscuro);
-    this.#vista.aplicarTamano(this.#tamano, TAMANO_MIN, TAMANO_MAX);
+    this.#aplicarTamano();
 
+    this.#vista.alCambiarTemaSistema((oscuro) => {
+      if (this.#temaElegido) return;
+      this.#oscuro = oscuro;
+      this.#vista.aplicarTema(oscuro);
+    });
     this.#vista.alPulsar((accion, id) => this.#ejecutar(accion, id));
     this.#vista.alTeclear((tecla) => {
       if (tecla === "ArrowLeft") this.#ejecutar("anterior");
@@ -36,19 +43,30 @@ export class Controlador {
     this.#vista.mostrarSoneto(soneto, this.#almacen.indiceDe(soneto), this.#almacen.total());
   }
 
+  // Con Anterior/Siguiente el foco se queda en el botón: se anuncia el soneto nuevo.
+  // (Desde el índice no hace falta: el foco va al título y el lector ya lo lee.)
+  #pasarA(indice) {
+    const soneto = this.#almacen.porIndice(indice);
+    this.#mostrar(soneto);
+    this.#vista.anunciar(`${soneto.titulo}, ${this.#almacen.indiceDe(soneto) + 1} de ${this.#almacen.total()}`);
+  }
+
   #ejecutar(accion, id) {
     const posicion = this.#almacen.indiceDe(this.#actual);
 
     switch (accion) {
-      case "ver":
-        this.#mostrar(this.#almacen.obtener(id));
+      case "ver": {
+        const soneto = this.#almacen.obtener(id);
+        if (!soneto) return;
+        this.#mostrar(soneto);
         this.#vista.llevarAlSoneto();
         break;
+      }
       case "anterior":
-        this.#mostrar(this.#almacen.porIndice(posicion - 1));
+        this.#pasarA(posicion - 1);
         break;
       case "siguiente":
-        this.#mostrar(this.#almacen.porIndice(posicion + 1));
+        this.#pasarA(posicion + 1);
         break;
       case "tamano-menos":
         this.#cambiarTamano(-TAMANO_PASO);
@@ -57,6 +75,7 @@ export class Controlador {
         this.#cambiarTamano(TAMANO_PASO);
         break;
       case "tema":
+        this.#temaElegido = true;
         this.#oscuro = !this.#oscuro;
         this.#vista.aplicarTema(this.#oscuro);
         break;
@@ -65,6 +84,10 @@ export class Controlador {
 
   #cambiarTamano(paso) {
     this.#tamano = Math.min(TAMANO_MAX, Math.max(TAMANO_MIN, this.#tamano + paso));
-    this.#vista.aplicarTamano(this.#tamano, TAMANO_MIN, TAMANO_MAX);
+    this.#aplicarTamano();
+  }
+
+  #aplicarTamano() {
+    this.#vista.aplicarTamano(this.#tamano, this.#tamano > TAMANO_MIN, this.#tamano < TAMANO_MAX);
   }
 }
