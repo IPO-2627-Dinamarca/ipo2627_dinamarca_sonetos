@@ -8,18 +8,22 @@
     calc(): H + 180. Cambiando el tono base se recalcula toda la paleta.
   - Primario (burdeos): para lo que se lee (marca y título del soneto).
   - Complementario (verde azulado): reservado a lo interactivo (foco, elemento activo).
-  - Neutros cálidos (--matiz-neutro) tintados de papel: fondo y texto, sin negro ni blanco puros.
+  - Neutros: el mismo tono base con muy poca saturación (fondo y texto), sin negro ni blanco puros.
+    Así la paleta solo tiene dos tonos: el base y su complementario.
+  Los bordes de los controles llegan a 3:1 sobre la superficie (WCAG 1.4.11).
   Modo claro/oscuro con light-dark(); el atributo data-tema lo fuerza vía color-scheme.
   Todos los pares texto/fondo cumplen contraste WCAG AA (≥ 4,5:1).
 
   ESTRATEGIA TIPOGRÁFICA · dos fuentes contrastadas
   - Serif del sistema (Palatino/Georgia): voz poética (título, autor, versos).
   - Sans del sistema (system-ui): voz de la interfaz (botones, índice, pie).
-  Solo fuentes locales del sistema, sin recursos externos.
+  - Escala de tamaños, pesos e interlineados definida aquí; los componentes solo
+    usan estas variables. Solo fuentes locales del sistema, sin recursos externos.
 
   ESTRATEGIA ESPACIAL
   - Espaciado en rem: desde 1rem crece con razón 1,5 (1 → 1,5 → 2,25 → 3,375)
     y hacia abajo se divide entre 2 (0,5 → 0,25). Medida de lectura en ch.
+  - Figura/fondo: la superficie del soneto es casi blanca sobre un fondo más oscuro.
   - Gestalt: proximidad (estrofas separadas, versos juntos), similitud (mismo
     estilo para cuartetos y tercetos), cierre (marco del soneto), figura/fondo.
 */
@@ -29,22 +33,37 @@
 
     --matiz-primario: 350;
     --matiz-complementario: calc(var(--matiz-primario) + 180);
-    --matiz-neutro: 40;
+    --matiz-neutro: var(--matiz-primario);
 
-    --fondo: light-dark(hsl(var(--matiz-neutro), 35%, 95%), hsl(var(--matiz-neutro), 10%, 12%));
-    --superficie: light-dark(hsl(var(--matiz-neutro), 40%, 98%), hsl(var(--matiz-neutro), 10%, 16%));
-    --borde: light-dark(hsl(var(--matiz-neutro), 20%, 84%), hsl(var(--matiz-neutro), 8%, 25%));
-    --texto: light-dark(hsl(var(--matiz-neutro), 15%, 14%), hsl(var(--matiz-neutro), 25%, 90%));
-    --texto-suave: light-dark(hsl(var(--matiz-neutro), 10%, 36%), hsl(var(--matiz-neutro), 10%, 68%));
+    --fondo: light-dark(hsl(var(--matiz-neutro), 12%, 88%), hsl(var(--matiz-neutro), 8%, 9%));
+    --superficie: light-dark(hsl(var(--matiz-neutro), 10%, 99%), hsl(var(--matiz-neutro), 8%, 18%));
+    --borde: light-dark(hsl(var(--matiz-neutro), 8%, 55%), hsl(var(--matiz-neutro), 6%, 50%));
+    --texto: light-dark(hsl(var(--matiz-neutro), 12%, 14%), hsl(var(--matiz-neutro), 15%, 90%));
+    --texto-suave: light-dark(hsl(var(--matiz-neutro), 8%, 32%), hsl(var(--matiz-neutro), 8%, 72%));
 
     --color-primario: light-dark(hsl(var(--matiz-primario), 65%, 30%), hsl(var(--matiz-primario), 60%, 76%));
     --color-complementario: light-dark(hsl(var(--matiz-complementario), 70%, 22%), hsl(var(--matiz-complementario), 50%, 72%));
-    --color-complementario-fondo: light-dark(hsl(var(--matiz-complementario), 30%, 90%), hsl(var(--matiz-complementario), 30%, 20%));
+    --color-complementario-fondo: light-dark(hsl(var(--matiz-complementario), 40%, 84%), hsl(var(--matiz-complementario), 30%, 21%));
 
     --fuente-poetica: "Palatino Linotype", Palatino, Georgia, serif;
     --fuente-interfaz: system-ui, -apple-system, "Segoe UI", sans-serif;
 
-    --tamano-lectura: 1.25rem;
+    --texto-mini: 0.8125rem;
+    --texto-pequeno: 0.875rem;
+    --texto-base: 1rem;
+    --texto-medio: 1.25rem;
+    --texto-grande: 2.25rem;
+    --texto-titulo: clamp(2rem, 1.2rem + 3vw, 3.375rem);
+    --tamano-lectura: 1.25rem; /* valor inicial; lo cambian los botones A− / A+ */
+
+    --peso-medio: 500;
+    --peso-seminegrita: 600;
+    --peso-negrita: 700;
+
+    --interlineado-titulo: 1.1;
+    --interlineado-compacto: 1.25;
+    --interlineado-texto: 1.6;
+    --espaciado-versalitas: 0.12em;
 
     --espacio-1: 0.25rem;
     --espacio-2: 0.5rem;

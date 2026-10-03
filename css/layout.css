@@ -10,7 +10,7 @@
       "indice   lectura"
       "pie      pie";
     gap: var(--espacio-5) var(--espacio-6);
-    max-width: 75rem;
+    width: min(100%, 75rem);
     margin-inline: auto;
     padding: var(--espacio-4) var(--espacio-4) var(--espacio-3);
     min-height: 100vh;
@@ -57,8 +57,8 @@
       grid-template-columns: minmax(0, 1fr);
       grid-template-areas:
         "cabecera"
-        "lectura"
         "indice"
+        "lectura"
         "pie";
       grid-template-rows: none;
       gap: var(--espacio-5);

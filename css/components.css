@@ -3,24 +3,45 @@
    Los estados se leen de atributos ARIA (aria-pressed, aria-current), así el
    estilo y la accesibilidad no se pueden desincronizar. */
 @layer componentes {
+  /* Enlace "Saltar al soneto": solo se ve cuando recibe el foco con el teclado. */
+  .salto:not(:focus) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .salto {
+    position: absolute;
+    left: var(--espacio-3);
+    top: var(--espacio-3);
+    padding: var(--espacio-2) var(--espacio-3);
+    background: var(--superficie);
+    border: 1px solid var(--color-complementario);
+    border-radius: var(--radio);
+    text-decoration: none;
+    color: inherit;
+    z-index: 10;
+  }
+
   /* Cabecera */
   .cabecera__marca {
     font-family: var(--fuente-poetica);
-    font-size: 2.25rem;
-    font-weight: 700;
-    line-height: 1;
+    font-size: var(--texto-grande);
+    font-weight: var(--peso-negrita);
+    line-height: var(--interlineado-titulo);
     color: var(--color-primario);
   }
 
   .cabecera__lema,
   .pie {
-    font-size: 0.875rem;
+    font-size: var(--texto-pequeno);
     color: var(--texto-suave);
   }
 
   /* Botones y ajustes */
-  .ajustes,
-  .pasar {
+  .ajustes {
     display: flex;
     flex-wrap: wrap;
     gap: var(--espacio-2);
@@ -33,12 +54,12 @@
     background: var(--superficie);
     border: 1px solid var(--borde);
     border-radius: var(--radio);
-    font-size: 0.875rem;
-    font-weight: 500;
+    font-size: var(--texto-pequeno);
+    font-weight: var(--peso-medio);
     cursor: pointer;
     transition: background-color var(--duracion), border-color var(--duracion);
 
-    &:hover:not(:disabled) {
+    &:hover:not(:disabled, [aria-disabled="true"]) {
       border-color: var(--color-complementario);
       background: var(--color-complementario-fondo);
     }
@@ -49,18 +70,25 @@
       color: var(--color-complementario);
     }
 
-    &:disabled {
+    /* aria-disabled en A−/A+ para no perder el foco al llegar al límite. */
+    &:disabled,
+    &[aria-disabled="true"] {
       opacity: 0.45;
       cursor: not-allowed;
     }
   }
 
   /* Índice */
+  .indice {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espacio-3);
+  }
+
   .indice__titulo {
-    margin-bottom: var(--espacio-3);
-    font-size: 0.875rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
+    font-size: var(--texto-pequeno);
+    font-weight: var(--peso-seminegrita);
+    letter-spacing: var(--espaciado-versalitas);
     text-transform: uppercase;
     color: var(--texto-suave);
   }
@@ -71,7 +99,7 @@
     gap: var(--espacio-1);
   }
 
-  .indice__enlace {
+  .indice__boton {
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -85,6 +113,7 @@
     transition: background-color var(--duracion), border-color var(--duracion);
 
     &:hover {
+      border-left-color: var(--texto-suave);
       background: var(--color-complementario-fondo);
     }
 
@@ -96,13 +125,13 @@
 
   .indice__nombre {
     font-family: var(--fuente-poetica);
-    font-size: 1.25rem;
-    font-weight: 600;
-    line-height: 1.25;
+    font-size: var(--texto-medio);
+    font-weight: var(--peso-seminegrita);
+    line-height: var(--interlineado-compacto);
   }
 
   .indice__autor {
-    font-size: 0.8125rem;
+    font-size: var(--texto-mini);
     color: var(--texto-suave);
   }
 
@@ -113,25 +142,29 @@
     border: 1px solid var(--borde);
     border-radius: var(--radio);
     font-family: var(--fuente-poetica);
+    display: flex;
+    flex-direction: column;
+    gap: var(--espacio-5);
   }
 
   .soneto__cabecera {
-    margin-bottom: var(--espacio-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--espacio-2);
     text-align: center;
   }
 
   .soneto__titulo {
-    font-size: clamp(2rem, 1.2rem + 3vw, 3.375rem);
-    font-weight: 700;
-    line-height: 1.1;
+    font-size: var(--texto-titulo);
+    font-weight: var(--peso-negrita);
+    line-height: var(--interlineado-titulo);
     color: var(--color-primario);
   }
 
   .soneto__autor {
-    margin-top: var(--espacio-2);
-    font-size: 1.25rem;
+    font-size: var(--texto-medio);
     font-style: italic;
-    font-weight: 500;
+    font-weight: var(--peso-medio);
     color: var(--texto-suave);
   }
 
@@ -144,26 +177,31 @@
     margin-inline: auto;
   }
 
-  .estrofa {
+  .soneto__estrofa {
+    display: flex;
+    flex-direction: column;
     max-width: var(--medida);
     font-size: var(--tamano-lectura);
-    line-height: 1.55;
+    line-height: var(--interlineado-texto);
   }
 
-  /* Si un verso no cabe en una línea, lo que sobra queda sangrado. */
-  .verso {
+  /* Sangría francesa: si un verso no cabe en una línea, lo que sobra queda sangrado.
+     Es el único valor negativo y es la forma estándar de conseguirla en CSS. */
+  .soneto__verso {
     padding-left: 2ch;
     text-indent: -2ch;
   }
 
   /* Navegación entre sonetos */
   .pasar {
+    display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: var(--espacio-2);
   }
 
   .pasar__posicion {
-    font-size: 0.875rem;
+    font-size: var(--texto-pequeno);
     color: var(--texto-suave);
   }
 }
