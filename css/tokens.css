@@ -1,32 +1,6 @@
 /* Orden de las capas: una capa posterior gana a una anterior sea cual sea la
    especificidad del selector, así no hacen falta !important ni selectores largos. */
 @layer tokens, base, layout, componentes;
-
-/*
-  ESTRATEGIA CROMÁTICA · complementaria (sistema HSL)
-  - Un único tono base (--matiz-primario, burdeos) y su complementario, calculado con
-    calc(): H + 180. Cambiando el tono base se recalcula toda la paleta.
-  - Primario (burdeos): para lo que se lee (marca y título del soneto).
-  - Complementario (verde azulado): reservado a lo interactivo (foco, elemento activo).
-  - Neutros: el mismo tono base con muy poca saturación (fondo y texto), sin negro ni blanco puros.
-    Así la paleta solo tiene dos tonos: el base y su complementario.
-  Los bordes de los controles llegan a 3:1 sobre el fondo y sobre la superficie (WCAG 1.4.11).
-  Modo claro/oscuro con light-dark(); el atributo data-tema lo fuerza vía color-scheme.
-  Todos los pares texto/fondo cumplen contraste WCAG AA (≥ 4,5:1).
-
-  ESTRATEGIA TIPOGRÁFICA · dos fuentes contrastadas
-  - Serif del sistema (Palatino/Georgia): voz poética (título, autor, versos).
-  - Sans del sistema (system-ui): voz de la interfaz (botones, índice, pie).
-  - Escala de tamaños, pesos e interlineados definida aquí; los componentes solo
-    usan estas variables. Solo fuentes locales del sistema, sin recursos externos.
-
-  ESTRATEGIA ESPACIAL
-  - Espaciado en rem: desde 1rem crece con razón 1,5 (1 → 1,5 → 2,25 → 3,375)
-    y hacia abajo se divide entre 2 (0,5 → 0,25). Medida de lectura en ch.
-  - Figura/fondo: la superficie del soneto es más clara que el fondo y lleva borde.
-  - Gestalt: proximidad (estrofas separadas, versos juntos), similitud (mismo
-    estilo para cuartetos y tercetos), cierre (marco del soneto), figura/fondo.
-*/
 @layer tokens {
   :root {
     color-scheme: light dark;
