@@ -1,5 +1,9 @@
 # Sonetos
 
+[Probar en línea](https://ipo-2627-dinamarca.github.io/ipo2627_dinamarca_sonetos/)
+
+![Lector de sonetos con la antología a la izquierda y el soneto «A una nariz», de Quevedo, abierto](img/captura.png)
+
 La aplicación web consiste en un lector de sonetos. Un `soneto` es una composición poética de 14 versos organizados en cuatro estrofas fijas: dos cuartetos (de 4 versos cada uno) y dos tercetos (de tres versos cada uno). 
 
 Los objetivos del proyecto son: 
