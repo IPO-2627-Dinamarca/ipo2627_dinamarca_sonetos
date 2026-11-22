@@ -47,52 +47,111 @@ La implementación de la interacción estará guiada para favorecer la usabilida
 
 # Solución
 
-Hecha solo con HTML, CSS y JavaScript del navegador: sin bibliotecas, sin frameworks, sin fuentes externas y sin instalar nada. Para verla hay que servir la carpeta con cualquier servidor local (por ejemplo, Live Server), porque los módulos de JS y la petición `fetch()` de los datos no funcionan abriendo el archivo con `file://`.
+La aplicación usa solo HTML, CSS y JavaScript del navegador, sin bibliotecas, frameworks ni fuentes externas. Para probarla hay que servir la carpeta con un servidor local (Live Server, `python3 -m http.server`...), porque los módulos de JS y la petición `fetch()` de los datos no funcionan si se abre el archivo con `file://`.
+
+La antología tiene cinco sonetos:
+
+| Soneto | Autor |
+|---|---|
+| A una nariz | Francisco de Quevedo |
+| Escrito está en mi alma | Garcilaso de la Vega |
+| Mientras por competir | Luis de Góngora |
+| Miré los muros | Francisco de Quevedo |
+| Definición de soneto | Lope de Vega |
 
 ## Estructura
 
 ```
-index.html              estructura semántica de la página
+index.html                 estructura semántica de la página
 css/
-  tokens.css            variables de diseño: colores, fuentes, espacios (y las tres estrategias)
-  base.css              reinicio y accesibilidad
-  layout.css            reparto de la página con Grid
-  components.css        aspecto de cada componente
+  tokens.css               orden de capas y variables de diseño (cromático, tipográfico, espacial)
+  base.css                 reinicio, foco visible y utilidades de accesibilidad
+  layout.css               reparto de la página con Grid
+  components.css           aspecto de cada componente
 data/
-  sonetos.json          "base de datos": los cinco sonetos (id, titulo, autor, versos)
+  sonetos.json             los cinco sonetos: id, titulo, autor y versos
+img/
+  captura.png, og.png      captura del README y vista previa al compartir el enlace
 js/
-  main.js               punto de entrada: carga los datos y une modelo, vista y controlador
-  model/                MODELO: Soneto y Almacen
-  view/vista.js         VISTA: la única que toca el DOM
-  controller/           CONTROLADOR: une eventos, modelo y vista
+  main.js                  punto de entrada: carga los datos y une modelo, vista y controlador
+  model/
+    soneto.js              Soneto: valida los datos y los agrupa en estrofas
+    almacen.js             Almacen: carga el JSON y guarda la colección
+  view/
+    vista.js               la única que toca el DOM y el CSSOM
+  controller/
+    controlador.js         estado de la lectura y reglas de cada acción
 ```
 
 ## Arquitectura MVC
 
-- **Datos** (`data/sonetos.json`): única fuente de los textos. Cada soneto es un objeto `{ id, titulo, autor, versos }` con sus 14 versos en orden; para añadir uno basta con editar el JSON. Respecto a los `.md` originales se corrigieron tres erratas del texto canónico («una alquitara», «más narizado», «Cuanto tengo»).
-- **Modelo** (`js/model/`): `Soneto` comprueba que los datos son válidos (id, título y autor como texto y una lista de 14 versos) y los agrupa en 2 cuartetos y 2 tercetos; `Almacen.cargar(url)` pide el JSON con `fetch()`, comprueba `respuesta.ok` y crea los `Soneto` (rechaza una lista vacía o con ids repetidos); después el `Almacen` guarda la colección y permite buscar un soneto por id o por posición.
-- **Vista** (`js/view/vista.js`): crea los elementos del índice y del soneto y aplica el tema y el tamaño del texto. No toma decisiones; avisa al controlador. Si los datos no cargan, muestra un aviso en lugar del soneto.
-- **Controlador** (`js/controller/controlador.js`): guarda el estado de la lectura (soneto actual, tamaño y tema) y decide qué hacer con cada botón o tecla.
-- HTML, CSS y JS se vinculan con `<link>` y `<script type="module">`; los módulos se cargan sin bloquear la página y cada archivo importa solo lo que necesita. `main.js` espera a que llegue el JSON (`await` en el módulo) antes de arrancar el controlador; si algo falla, deja el error en la consola y la vista avisa al usuario. Mientras tanto la página muestra «Cargando los sonetos…», que también sirve de aviso si se abre con `file://` y los módulos no llegan a cargarse.
+Los textos están en `data/sonetos.json`, que es su única fuente. Cada soneto es un objeto `{ id, titulo, autor, versos }` con sus 14 versos en orden, así que para añadir uno basta con editar el JSON. Respecto al texto de partida se corrigieron tres erratas («una alquitara», «más narizado», «Cuanto tengo»).
+
+`Soneto` comprueba que el id, el título y el autor son texto y que hay exactamente 14 versos, y los agrupa con el getter `estrofas`: dos cuartetos y dos tercetos. `Almacen.cargar(url)` pide el JSON con `fetch()`, comprueba `respuesta.ok` y crea los `Soneto`; el constructor rechaza una lista vacía o con ids repetidos. Después el almacén guarda la colección en un campo privado y la consulta con `listar`, `total`, `obtener(id)`, `indiceDe(soneto)` y `porIndice(indice)`, que da la vuelta al pasar del último soneto al primero y al revés. Ninguna de las dos clases toca el DOM.
+
+`Vista` crea los elementos del índice y del soneto y aplica el tema y el tamaño del texto. No toma decisiones: avisa al controlador con callbacks (`alPulsar`, `alTeclear`, `alCambiarTemaSistema`). Si los datos no cargan, `mostrarError` pone un aviso en lugar del soneto y desactiva los botones.
+
+`Controlador` guarda el soneto actual, el tamaño y el tema, y decide qué hacer con cada acción (`ver`, `anterior`, `siguiente`, `tamano-menos`, `tamano-mas`, `tema`) o con las flechas del teclado. Pide los datos al almacén y le dice a la vista qué mostrar.
+
+HTML, CSS y JS se vinculan con `<link>` y `<script type="module">`: los módulos se cargan sin bloquear la página y cada archivo importa solo lo que necesita. `main.js` espera con `await` a que lleguen los datos antes de arrancar el controlador; si algo falla, deja el error en la consola y la vista avisa al usuario. Mientras tanto la página muestra «Cargando los sonetos…», que también sirve de aviso si se abre con `file://` y los módulos no llegan a cargarse.
+
+## Composición
+
+- Grid para lo bidimensional: la página usa áreas con nombre (`cabecera`, `indice`, `lectura`, `pie`) con una columna de 15 a 20 rem para el índice y otra flexible para el soneto, en un contenedor de hasta 75 rem. El índice se queda fijo (`position: sticky`) mientras se lee.
+- Por debajo de 52 rem la página pasa a una columna, en el orden del HTML (índice y después soneto), de modo que el orden del tabulador coincide con lo que se ve.
+- Flexbox con `gap` para lo unidimensional: cabecera, ajustes, lista del índice, tarjeta del soneto y barra de navegación. No hay márgenes entre hermanos.
+- El cuerpo del soneto mide lo que su estrofa más ancha (`width: fit-content`), con un máximo de 48 `ch` por línea, y se centra en la tarjeta. Si un verso no cabe en una línea, lo que sobra queda sangrado (sangría francesa con `padding-left` y `text-indent` de 2 `ch`).
 
 ## Estilística
 
-- **Cromática · complementaria**: burdeos para lo que se lee (títulos) y su complementario, verde azulado, solo para lo interactivo (foco, botón pulsado, soneto activo). Fondo y texto son neutros del mismo tono base con poca saturación, sin negro ni blanco puros, así que la paleta solo tiene dos tonos. Paleta en `hsl()` parametrizada con `var()` y `calc()`: un único tono base y el complementario se calcula como H + 180. Modo claro/oscuro con `light-dark()`, contrastes texto/fondo WCAG AA y bordes de los controles a 3:1 sobre el fondo y sobre la superficie.
-- **Tipográfica · dos fuentes contrastadas**: serif (Palatino/Georgia) para la voz poética y sans del sistema para la interfaz. Son fuentes que ya tiene el equipo, así que no hay descargas. Tamaños, pesos e interlineados son variables de `tokens.css`; los componentes no llevan valores sueltos.
-- **Espacial**: unidades `rem` con una escala que sube con razón 1,5 (1 → 1,5 → 2,25 → 3,375) y baja dividiendo entre 2 (0,5 → 0,25), medida de línea en `ch`, Grid con áreas con nombre para la página y Flexbox con `gap` dentro de cada bloque (sin márgenes entre hermanos). Gestalt: *proximidad* (versos juntos, estrofas separadas), *similitud* (todas las estrofas con el mismo estilo), *cierre* (el marco del soneto) y *figura/fondo* (superficie clara sobre fondo más oscuro).
+Cada estrategia tiene su bloque en `css/tokens.css`, y el resto de hojas solo usa esas variables.
+
+### Cromática
+
+Esquema complementario con un único matiz base, el burdeos (`--matiz-primario: 350`). Su opuesto, el verde azulado, se calcula con `--matiz-complementario: calc(var(--matiz-primario) + 180)`. Cada uno tiene un papel: el burdeos es lo que se lee (el nombre de la aplicación y los títulos de los sonetos) y el verde azulado es lo que se puede tocar (foco, botón pulsado y soneto activo del índice).
+
+El fondo, las superficies y el texto son neutros del mismo matiz que el burdeos, con poca saturación y sin negro ni blanco puros, así que la paleta solo tiene dos tonos. Todo está en `hsl()` con `var()` y `calc()`. El modo claro y el oscuro se resuelven con `light-dark()`, y el botón de tema fija `color-scheme` mediante el atributo `data-tema` de `<html>`.
+
+Contrastes calculados sobre los valores de `tokens.css`: el texto principal pasa de 10:1 en los dos modos, el texto secundario de 6:1, el burdeos sobre la tarjeta de 6,5:1 y los bordes de los controles de 3:1 sobre el fondo y sobre la superficie.
+
+### Tipográfica
+
+Dos fuentes contrastadas, las dos del sistema para no descargar nada. La voz poética (títulos, versos, nombres del índice) va en serifa (`Palatino Linotype`, Palatino, Georgia) y la interfaz (botones, etiquetas, avisos) en la sans del sistema. La serifa da el carácter de libro y la sans se lee bien en tamaños pequeños.
+
+Los tamaños, pesos e interlineados son variables: una escala de 13, 14, 16, 20 y 36 px, un título fluido con `clamp()` que va de 32 a 54 px y un tamaño de lectura que parte de 20 px. Los componentes no llevan valores sueltos. Solo el título del índice va en mayúsculas espaciadas, porque es una etiqueta corta.
+
+### Espacial
+
+Unidades `rem` con una escala de espaciado que sube con razón 1,5 (1 → 1,5 → 2,25 → 3,375) y baja dividiendo entre 2 (0,5 → 0,25). La medida de línea se fija en `ch`, que es la unidad que sigue al tamaño de la letra. Los radios son de 0,5 rem.
+
+Principios de la Gestalt:
+
+- Proximidad: los versos de una estrofa van juntos y las estrofas se separan entre sí.
+- Semejanza: todas las estrofas comparten estilo, tanto las de cuatro versos como las de tres.
+- Cierre: la tarjeta con borde enmarca el soneto como una unidad.
+- Figura y fondo: superficie clara sobre un fondo más oscuro en modo claro, y al revés en modo oscuro.
+
+Botones y controles miden al menos 44 px para poder pulsarlos con el dedo.
 
 ## Interacción y usabilidad
 
-- Índice de sonetos, botones Anterior/Siguiente y flechas ← → del teclado (sin Alt, Ctrl, Meta ni Mayús, para no pisar los atajos del navegador; mantener pulsada la flecha no recorre la lista).
-- El índice marca el soneto que se está leyendo y el texto «1 de 5» indica la posición. Del último se pasa al primero y al revés.
-- Ajustes de lectura: tamaño del texto (A− / A+, con límites) y modo oscuro. Al abrir la página se respeta el tema del sistema y se sigue su cambio mientras el usuario no pulse el botón.
-- En móvil todo va en una columna, en el mismo orden que el HTML (índice y después soneto), así el orden del tabulador coincide con lo que se ve; al elegir uno en el índice, la página baja hasta el principio del soneto (solo si el título no está ya a la vista).
-- Accesibilidad: enlace "Saltar al soneto", foco visible, `aria-pressed` y `aria-current` para los estados, botones de al menos 44 px y respeto a `prefers-reduced-motion`. Con Anterior/Siguiente o las flechas el soneto nuevo se anuncia en una región `aria-live` oculta («Miré los muros, 4 de 5»); al elegir en el índice, el foco pasa al título del soneto (y no se anuncia dos veces). A− y A+ usan `aria-disabled` en los límites para no perder el foco.
-- Los botones empiezan desactivados en el HTML y se activan cuando los sonetos han cargado; si no se pueden cargar, la página lo explica y siguen desactivados.
+- Se elige el soneto en la lista «Antología», con los botones Anterior y Siguiente o con las flechas del teclado. El atajo no se activa si se pulsa con Alt, Ctrl, Meta o Mayús, para no pisar los del navegador, y mantener pulsada la flecha no recorre la lista.
+- Estado visible: el soneto abierto se marca en el índice (`aria-current`) y debajo del soneto aparece su posición («1 de 5»). Del último se pasa al primero y del primero al último.
+- Ajustes de lectura: tamaño del texto con A− y A+ (de 16 a 28 px, en pasos de 4) y modo oscuro. Al abrir la página se respeta el tema del sistema y se sigue su cambio hasta que el usuario pulsa el botón. El título de la pestaña cambia con el soneto.
+- En móvil, al elegir un soneto en el índice la página baja hasta su principio, pero solo si el título no está ya a la vista; en escritorio no se mueve.
+- Accesibilidad: enlace «Saltar al soneto», foco visible, `aria-pressed` y `aria-current` para los estados y respeto a `prefers-reduced-motion` (las transiciones pasan a 0 s). Con Anterior, Siguiente o las flechas, el soneto nuevo se anuncia en una región `aria-live` oculta («Miré los muros, 4 de 5»). Al elegir en el índice, el foco pasa al título del soneto y no se anuncia dos veces. A− y A+ usan `aria-disabled` en los límites para no perder el foco.
+- Los botones empiezan desactivados en el HTML y se activan cuando los sonetos han cargado. Si no se pueden cargar, la página lo explica y siguen desactivados.
+
+## Recursos de CSS
+
+- Capas (`@layer tokens, base, layout, componentes`), declaradas una sola vez: el orden de las capas decide qué regla gana, así que no hacen falta `!important` ni selectores largos.
+- `:where()` en el reinicio para dejar su especificidad a cero y que cualquier componente la supere.
+- Clases con nomenclatura BEM (`soneto__estrofa`, `soneto__verso`, `indice__boton`, `pasar__posicion`...) y anidamiento nativo para los estados (`&:hover`, `&[aria-current="true"]`, `&:disabled`).
+- Los estados visuales se leen de atributos ARIA (`aria-pressed`, `aria-current`, `aria-disabled`), así el estilo y la accesibilidad no pueden desincronizarse.
+- `.solo-lector` oculta sin quitar del árbol de accesibilidad los avisos y los nombres de estrofa, y el enlace de salto usa la misma técnica hasta recibir el foco.
 
 ## Buenas prácticas
 
-- **HTML semántico**: `header`, `nav`, `main` y `footer`; un único `h1` y `h2` para los apartados; `article` para el soneto, una `section` por estrofa con un `h3` solo para lector de pantalla («Primer cuarteto»…) y un `p` por verso.
-- **CSS moderno**: capas `@layer` para controlar la cascada, `:where()` para no subir la especificidad, nombres de clase BEM (`soneto__estrofa`, `soneto__verso`, `indice__boton`…) y anidamiento nativo.
-- **JS ↔ DOM**: la vista localiza los elementos por `data-vista` y `data-accion`, no por clases de estilo, y un solo escuchador en `document` atiende todos los botones (delegación de eventos).
-- **JS ↔ CSSOM**: el JS no escribe estilos sueltos. Lee el tamaño inicial de `--tamano-lectura` con `getComputedStyle`, solo cambia esa variable y el atributo `data-tema`, y el CSS decide cómo se ve.
+- HTML semántico: `header`, `nav`, `main` y `footer`; un único `h1` y un `h2` por apartado; `article` para el soneto, una `section` por estrofa con un `h3` solo para lectores de pantalla («Primer cuarteto»...) y un `p` por verso. Las dos navegaciones llevan nombre accesible.
+- JS y DOM: la vista localiza los elementos por `data-vista` y `data-accion` (las clases quedan para el estilo) y un único escuchador en `document` atiende todos los botones por delegación de eventos.
+- JS y CSSOM: el JS no escribe estilos sueltos. Lee el tamaño inicial de `--tamano-lectura` con `getComputedStyle`, cambia solo esa variable y el atributo `data-tema`, y el CSS decide cómo se ve.
